@@ -1,12 +1,14 @@
-Mar 28, 2018 9:47:24 PM repastcity3.main.ContextManager build
+Mar 28, 2018 11:13:42 PM repastcity3.main.ContextManager build
 INFO: Creating agents with the agent definition: 'random:people.shp$repastcity3.agent.DefaultAgent'
-Mar 28, 2018 9:47:30 PM repastcity3.main.ContextManager printTicks
-INFO: Iterations: 1.0. Speed: 1.522248450295E9sec/ticks.
-Mar 28, 2018 9:47:40 PM repastcity3.main.ContextManager printTicks
-INFO: Iterations: 1001.0. Speed: 10.092sec/ticks.
-Mar 28, 2018 9:47:47 PM repastcity3.main.ContextManager printTicks
-INFO: Iterations: 2001.0. Speed: 6.61sec/ticks.
-Mar 28, 2018 9:47:53 PM repastcity3.main.ContextManager printTicks
-INFO: Iterations: 3001.0. Speed: 6.561sec/ticks.
-Mar 28, 2018 9:48:00 PM repastcity3.main.ContextManager printTicks
-INFO: Iterations: 4001.0. Speed: 6.449sec/ticks.
+Mar 28, 2018 11:13:46 PM repastcity3.main.ContextManager printTicks
+INFO: Iterations: 1.0. Speed: 1.522253626726E9sec/ticks.
+Mar 28, 2018 11:13:57 PM repastcity3.main.ContextManager printTicks
+INFO: Iterations: 1001.0. Speed: 11.187sec/ticks.
+Mar 28, 2018 11:14:04 PM repastcity3.main.ContextManager printTicks
+INFO: Iterations: 2001.0. Speed: 6.873sec/ticks.
+Mar 28, 2018 11:14:11 PM repastcity3.main.ContextManager printTicks
+INFO: Iterations: 3001.0. Speed: 6.789sec/ticks.
+Mar 28, 2018 11:14:18 PM repastcity3.main.ContextManager printTicks
+INFO: Iterations: 4001.0. Speed: 6.795sec/ticks.
+Mar 28, 2018 11:14:25 PM repastcity3.main.ContextManager printTicks
+INFO: Iterations: 5001.0. Speed: 6.851sec/ticks.

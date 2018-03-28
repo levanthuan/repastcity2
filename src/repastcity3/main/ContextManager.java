@@ -95,9 +95,10 @@ public class ContextManager implements ContextBuilder<Object> {
 			String buildingFile = gisDataDir + getProperty(GlobalVars.BuildingShapefile);//buildingFile = ./data/gis_data/toy_city/buildings.shp			
 			GISFunctions.readShapefile(Building.class, buildingFile, buildingProjection, buildingContext);	// Đọc shapefile buildingFile
 			
-			mainContext.addSubContext(buildingContext);											// add context con vào contex cha.
-			SpatialIndexManager.createIndex(buildingProjection, Building.class);				//Tạo một chỉ mục không gian mới cho địa lý.			
-			LOGGER.log(Level.FINER, "Read " + buildingContext.getObjects(Building.class).size() + " buildings from "+ buildingFile);
+			mainContext.addSubContext(buildingContext);										// add context con vào contex cha.
+			SpatialIndexManager.createIndex(buildingProjection, Building.class);			//Tạo một chỉ mục không gian mới cho địa lý.
+			System.out.println(buildingContext.getObjects(Building.class).size());
+			//LOGGER.log(Level.FINER, "Read " + buildingContext.getObjects(Building.class).size() + " buildings from "+ buildingFile);
 
 			
 			roadContext = new RoadContext();
@@ -105,12 +106,13 @@ public class ContextManager implements ContextBuilder<Object> {
 													GlobalVars.CONTEXT_NAMES.ROAD_GEOGRAPHY, roadContext,
 													new GeographyParameters<Road>(new SimpleAdder<Road>()));
 			
-			String roadFile = gisDataDir + getProperty(GlobalVars.RoadShapefile);		//roadFile = ./data/gis_data/toy_city/roads.shp
+			String roadFile = gisDataDir + getProperty(GlobalVars.RoadShapefile);		//roadFile = ./data/gis_data/toy_city/roads.shp			
 			GISFunctions.readShapefile(Road.class, roadFile, roadProjection, roadContext);
-						
+			
 			mainContext.addSubContext(roadContext);
 			SpatialIndexManager.createIndex(roadProjection, Road.class);
-			LOGGER.log(Level.FINER, "Read " + roadContext.getObjects(Road.class).size() + " roads from " + roadFile);
+			System.out.println(roadContext.getObjects(Road.class).size());
+			//LOGGER.log(Level.FINER, "Read " + roadContext.getObjects(Road.class).size() + " roads from " + roadFile);
 
 			// Create road network
 
