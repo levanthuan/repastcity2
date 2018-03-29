@@ -14,7 +14,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 import repast.simphony.context.Context;
-import repast.simphony.context.DefaultContext;
 import repast.simphony.context.space.gis.GeographyFactoryFinder;
 import repast.simphony.context.space.graph.NetworkBuilder;
 import repast.simphony.dataLoader.ContextBuilder;
@@ -52,13 +51,6 @@ public class ContextManager implements ContextBuilder<Object> {
 
 	private static Properties properties;
 
-	/*
-	 * Pointers to contexts and projections (for convenience). Most of these can be made public, but the agent ones
-	 * can't be because multi-threaded agents will simultaneously try to call 'move()' and interfere with each other. So
-	 * methods like 'moveAgent()' are provided by ContextManager.
-	 */
-
-	// building context and projection cab be public (thread safe) because buildings only queried
 	public static Context<Building> buildingContext;
 	public static Geography<Building> buildingProjection;
 
@@ -89,42 +81,39 @@ public class ContextManager implements ContextBuilder<Object> {
 		try {
 			buildingContext = new BuildingContext();
 			buildingProjection = GeographyFactoryFinder.createGeographyFactory(null).createGeography(
-													GlobalVars.CONTEXT_NAMES.BUILDING_GEOGRAPHY, buildingContext,
-													new GeographyParameters<Building>(new SimpleAdder<Building>()));
-			
+													GlobalVars.CONTEXT_NAMES.BUILDING_GEOGRAPHY, 
+													buildingContext,
+													new GeographyParameters<Building>(new SimpleAdder<Building>()));			
 			String buildingFile = gisDataDir + getProperty(GlobalVars.BuildingShapefile);//buildingFile = ./data/gis_data/toy_city/buildings.shp			
-			GISFunctions.readShapefile(Building.class, buildingFile, buildingProjection, buildingContext);	// Đọc shapefile buildingFile
+			GISFunctions.readShapefile(Building.class, buildingFile, buildingProjection, buildingContext);			
+			mainContext.addSubContext(buildingContext);
+			SpatialIndexManager.createIndex(buildingProjection, Building.class);
 			
-			mainContext.addSubContext(buildingContext);										// add context con vào contex cha.
-			SpatialIndexManager.createIndex(buildingProjection, Building.class);			//Tạo một chỉ mục không gian mới cho địa lý.
-			//LOGGER.log(Level.FINER, "Read " + buildingContext.getObjects(Building.class).size() + " buildings from "+ buildingFile);
-
 			
 			roadContext = new RoadContext();
 			roadProjection = GeographyFactoryFinder.createGeographyFactory(null).createGeography(
-													GlobalVars.CONTEXT_NAMES.ROAD_GEOGRAPHY, roadContext,
-													new GeographyParameters<Road>(new SimpleAdder<Road>()));
-			
-			String roadFile = gisDataDir + getProperty(GlobalVars.RoadShapefile);		//roadFile = ./data/gis_data/toy_city/roads.shp			
-			GISFunctions.readShapefile(Road.class, roadFile, roadProjection, roadContext);
-			
+													GlobalVars.CONTEXT_NAMES.ROAD_GEOGRAPHY, 
+													roadContext,
+													new GeographyParameters<Road>(new SimpleAdder<Road>()));			
+			String roadFile = gisDataDir + getProperty(GlobalVars.RoadShapefile);			//roadFile = ./data/gis_data/toy_city/roads.shp			
+			GISFunctions.readShapefile(Road.class, roadFile, roadProjection, roadContext);			
 			mainContext.addSubContext(roadContext);
 			SpatialIndexManager.createIndex(roadProjection, Road.class);
-			//LOGGER.log(Level.FINER, "Read " + roadContext.getObjects(Road.class).size() + " roads from " + roadFile);
 
-			// Create road network
-
-			// 1.junctionContext and junctionGeography
-			junctionContext = new JunctionContext();
-			mainContext.addSubContext(junctionContext);
-			junctionGeography = GeographyFactoryFinder.createGeographyFactory(null).createGeography(
-												GlobalVars.CONTEXT_NAMES.JUNCTION_GEOGRAPHY, junctionContext,
-												new GeographyParameters<Junction>(new SimpleAdder<Junction>()));
-			// 2. roadNetwork
-			NetworkBuilder<Junction> builder = new NetworkBuilder<Junction>(GlobalVars.CONTEXT_NAMES.ROAD_NETWORK, junctionContext, false);
-			builder.setEdgeCreator(new NetworkEdgeCreator<Junction>());			//Tạo các cạnh cho mạng được tạo ra
-			roadNetwork = builder.buildNetwork();
-			GISFunctions.buildGISRoadNetwork(roadProjection, junctionContext, junctionGeography, roadNetwork);
+			// Tạo mạng lưới đường
+				// 1.junctionContext and junctionGeography
+			
+				junctionContext = new JunctionContext();
+				mainContext.addSubContext(junctionContext);
+				junctionGeography = GeographyFactoryFinder.createGeographyFactory(null).createGeography(
+														GlobalVars.CONTEXT_NAMES.JUNCTION_GEOGRAPHY, 
+														junctionContext,
+														new GeographyParameters<Junction>(new SimpleAdder<Junction>()));
+				// 2. roadNetwork
+				NetworkBuilder<Junction> builder = new NetworkBuilder<Junction>(GlobalVars.CONTEXT_NAMES.ROAD_NETWORK, junctionContext, false);
+				builder.setEdgeCreator(new NetworkEdgeCreator<Junction>());			//Tạo các cạnh cho mạng được tạo ra
+				roadNetwork = builder.buildNetwork();
+				GISFunctions.buildGISRoadNetwork(roadProjection, junctionContext, junctionGeography, roadNetwork);
 			
 		} catch (MalformedURLException e) {
 			LOGGER.log(Level.SEVERE, "", e);
@@ -135,23 +124,21 @@ public class ContextManager implements ContextBuilder<Object> {
 		}
 
 		try {
-			agentContext = new AgentContext();
-			mainContext.addSubContext(agentContext);
+			agentContext = new AgentContext();			
 			agentGeography = GeographyFactoryFinder.createGeographyFactory(null).createGeography(
-					GlobalVars.CONTEXT_NAMES.AGENT_GEOGRAPHY, 
-					agentContext,
-					new GeographyParameters<IAgent>(new SimpleAdder<IAgent>()));
-																			//agentDefn = point:people.shp$repastcity3.agent.DefaultAgent
-			String agentDefn = ContextManager.getParameter(MODEL_PARAMETERS.AGENT_DEFINITION.toString());			     							
-			LOGGER.log(Level.INFO, "Creating agents with the agent definition: '" + agentDefn + "'");
-			
+													GlobalVars.CONTEXT_NAMES.AGENT_GEOGRAPHY, 
+													agentContext,
+													new GeographyParameters<IAgent>(new SimpleAdder<IAgent>()));
+			mainContext.addSubContext(agentContext);
+			String agentDefn = ContextManager.getParameter(MODEL_PARAMETERS.AGENT_DEFINITION.toString());
+																	//agentDefn = point:people.shp$repastcity3.agent.DefaultAgent
 			@SuppressWarnings("unused")
 			AgentFactory agentFactory = new AgentFactory(agentDefn);
 
 		} catch (ParameterNotFoundException e) {
 			LOGGER.log(Level.SEVERE, "Could not find the parameter which defines how agents should be "
-					+ "created. The parameter is called " + MODEL_PARAMETERS.AGENT_DEFINITION
-					+ " and should be added to the parameters.xml file.", e);
+										+ "created. The parameter is called " + MODEL_PARAMETERS.AGENT_DEFINITION
+										+ " and should be added to the parameters.xml file.", e);
 			return null;
 		} 
 		catch (AgentCreationException e) {
@@ -170,12 +157,6 @@ public class ContextManager implements ContextBuilder<Object> {
 		// Schedule something that outputs ticks every 1000 iterations.Lên lịch một cái gì đó xuất ra mỗi lần lặp lại 1000 lần lặp
 		schedule.schedule(ScheduleParameters.createRepeating(1, 1000, ScheduleParameters.LAST_PRIORITY), this, "printTicks");
 
-		/*
-		 * Schedule the agents. This is slightly complicated because if all the agents can be stepped at the same time
-		 * (i.e. there are no inter- agent communications that make this difficult) then the scheduling is controlled by
-		 * a separate function that steps them in different threads. This massively improves performance on multi-core
-		 * machines.
-		 */
 		boolean isThreadable = true;
 		for (IAgent a : agentContext.getObjects(IAgent.class)) {
 			if (!a.isThreadable()) {
@@ -243,8 +224,7 @@ public class ContextManager implements ContextBuilder<Object> {
 	 * Get the value of a property in the properties file. If the input is empty or null or if there is no property with
 	 * a matching name, throw a RuntimeException.
 	 * 
-	 * @param property
-	 *            The property to look for.
+	 * @param property The property to look for.
 	 * @return A value for the property with the given name.
 	 */
 	public static String getProperty(String property) {
@@ -367,5 +347,4 @@ public class ContextManager implements ContextBuilder<Object> {
 	public static Geography<IAgent> getAgentGeography() {
 		return ContextManager.agentGeography;
 	}
-
 }

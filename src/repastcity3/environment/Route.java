@@ -1,32 +1,11 @@
-/*
-©Copyright 2012 Nick Malleson
-This file is part of RepastCity.
-
-RepastCity is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-RepastCity is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with RepastCity.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 package repastcity3.environment;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -45,7 +24,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 
@@ -88,9 +66,9 @@ public class Route implements Cacheable {
 		Coordinate currentCoord = ContextManager.getAgentGeometry(this.agent).getCoordinate();	//tọa độ hiện tại
 		Coordinate destCoord = this.destination;												// tọa độ nơi đến		
 
-		double x = currentCoord.x;
-		double y = currentCoord.y;
-		System.out.println("curent-X = "+x+" curent-Y = "+y+" dest-X: "+ destCoord.x +"dest-Y: "+ destCoord.y);
+//		double x = currentCoord.x;
+//		double y = currentCoord.y;
+//		System.out.println("curent-X = "+x+" curent-Y = "+y+" dest-X: "+ destCoord.x +"dest-Y: "+ destCoord.y);
 		
 		try {
 			boolean destinationOnRoad = true; 		//true: tọa độ điểm cuối có nằm trên roads, false: tọa độ ko nằm trên roads

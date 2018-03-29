@@ -1,21 +1,3 @@
-/*
-©Copyright 2012 Nick Malleson
-This file is part of RepastCity.
-
-RepastCity is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-RepastCity is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of  the GNU General Public License
-along with RepastCity.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 package repastcity3.agent;
 
 import java.util.List;
@@ -44,27 +26,27 @@ public class DefaultAgent implements IAgent {
 
 	@Override
 	public void step() throws Exception {
-		LOGGER.log(Level.FINE, "Agent " + this.id + " is stepping.");
-		if (this.route == null) {		// Khởi tạo đầu chương trình
-			this.goingHome = false; 	// Phải ra khỏi nhà									
-			Building b = ContextManager.buildingContext.getRandomObject();	// Chọn random một tòa nhà mới để đi đến			
-			this.route = new Route(this, b.getCoords(), b);
-		}		
-		
-		if (!this.route.atDestination()) {// Chưa đến đích
-			
-			this.route.travel();
-			
-		} else {						// Đã đến đích, bây giờ hoặc về nhà hoặc lên tòa nhà khác
-			if (this.goingHome) {
-				this.goingHome = false;				
-				Building b = ContextManager.buildingContext.getRandomObject();				
-				this.route = new Route(this, b.getCoords(), b);
-			} else {
-				this.goingHome = true;
-				this.route = new Route(this, this.home.getCoords(), this.home);
-			}
-		}
+//		LOGGER.log(Level.FINE, "Agent " + this.id + " is stepping.");
+//		if (this.route == null) {		// Khởi tạo đầu chương trình
+//			this.goingHome = false; 	// Phải ra khỏi nhà									
+//			Building b = ContextManager.buildingContext.getRandomObject();	// Chọn random một tòa nhà mới để đi đến			
+//			this.route = new Route(this, b.getCoords(), b);
+//		}
+//				
+//		if (!this.route.atDestination()) {// Chưa đến đích
+//			
+//			this.route.travel();
+//			
+//		} else {						// Đã đến đích, bây giờ hoặc về nhà hoặc lên tòa nhà khác
+//			if (this.goingHome) {
+//				this.goingHome = false;				
+//				Building b = ContextManager.buildingContext.getRandomObject();				
+//				this.route = new Route(this, b.getCoords(), b);
+//			} else {
+//				this.goingHome = true;
+//				this.route = new Route(this, this.home.getCoords(), this.home);
+//			}
+//		}
 	}
 
 	/**
