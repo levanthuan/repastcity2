@@ -30,8 +30,8 @@ public class DefaultAgent implements IAgent {
 
 	private static Logger LOGGER = Logger.getLogger(DefaultAgent.class.getName());
 
-	private Building home; // Where the agent lives
-	private Route route; // An object to move the agent around the world
+	private Building home;
+	private Route route;
 
 	private boolean goingHome = false; // Whether the agent is going to or from their home
 
@@ -45,11 +45,12 @@ public class DefaultAgent implements IAgent {
 	@Override
 	public void step() throws Exception {
 		LOGGER.log(Level.FINE, "Agent " + this.id + " is stepping.");
-		if (this.route == null) {
-			this.goingHome = false; // Phải ra khỏi nhà									
-			Building b = ContextManager.buildingContext.getRandomObject();// Chọn random một tòa nhà mới để đi đến			
+		if (this.route == null) {		// Khởi tạo đầu chương trình
+			this.goingHome = false; 	// Phải ra khỏi nhà									
+			Building b = ContextManager.buildingContext.getRandomObject();	// Chọn random một tòa nhà mới để đi đến			
 			this.route = new Route(this, b.getCoords(), b);
-		}
+		}		
+		
 		if (!this.route.atDestination()) {// Chưa đến đích
 			
 			this.route.travel();
@@ -64,7 +65,7 @@ public class DefaultAgent implements IAgent {
 				this.route = new Route(this, this.home.getCoords(), this.home);
 			}
 		}
-	} // step()
+	}
 
 	/**
 	 * There will be no inter-agent communication so these agents can be executed simulataneously in separate threads.

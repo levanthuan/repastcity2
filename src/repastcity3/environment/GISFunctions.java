@@ -49,11 +49,10 @@ public class GISFunctions {
 	private static Logger LOGGER = Logger.getLogger(Route.class.getName());
 
 	/**
-	 * Create the road network. Runs through the roads in the <code>roadGeography</code> and, for each one, will create
-	 * <code>Junction</code> objects at their end points and an edge linking them. The <code>Junction</code> objects are
-	 * added to the given <code>junctionGeography</code> (so that we know where they are spatially) and they are also
-	 * added, along with the edge between them, to the <code>junctionNetwork</code> so that topographical relationships
-	 * can be established. (The <code>junctionNetwork</code> is part of the <code>junctionContext</code>
+	 * Các đối tượng đường giao nhau là các đối tượng đường giao nhau của chúng là các điểm kết thúc của chúng và một cạnh kết nối chúng. 
+	 * Các đối tượng đường giao nhau được thêm vào địa điểm đường giao nhau (để chúng ta biết được nơi chúng được ở không gian ) 
+	 * và chúng được thêm vào, vào mạng kết nối để các mối quan hệ địa hình có thể được thiết lập 
+	 * (Các junctionNetwork là một phần của junctionContext
 	 * 
 	 * @param roadGeography
 	 * @param junctionContext

@@ -23,30 +23,6 @@ import java.util.logging.Logger;
 
 import repastcity3.main.ContextManager;
 
-/**
- * This class can be used to step agents in different threads simulataneously.
- * If the <code>ContextManager</code> determines that this is a good idea (e.g.
- * if there will be no inter-agent communication) then, rather than using Repast
- * to schedule each agent's step() method directly, it will schedule the
- * agentStep() method (below) instead. This method is then responsible for
- * making the agents step by delegating the work do different threads depending
- * on how many CPU cores are free. As you can imagine, this leads to massive
- * decreases in computation time on multi-core computers.
- * 
- * <p>
- * It is important to note that there will be other side-effects from using
- * multiple threads, particularly agents simultaneously trying to access
- * Building methods or trying to write output data. So care needs to be taken
- * with the rest of the model to prevent problems. The (fairly) naive way that
- * I've tackled this is basically with the liberal use of
- * <code>synchronized</code>
- * </p>
- * 
- * @author Nick Malleson
- * @see ContextManager
- * @see ThreadController
- * @see BurglarThread
- */
 public class ThreadedAgentScheduler {
 	
 	private static Logger LOGGER = Logger.getLogger(ThreadedAgentScheduler.class.getName());

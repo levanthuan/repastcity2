@@ -33,36 +33,30 @@ public class AgentFactory {
 
 	private static Logger LOGGER = Logger.getLogger(AgentFactory.class.getName());
 
-	/** Phương pháp sử dụng khi tạo các tác nhân (xác định trong constructor). */
-	private AGENT_FACTORY_METHODS methodToUse;
-
-	/** Định nghĩa của các tác tử - cụ thể đối với phương pháp đang được sử dụng */
-	private String definition;
+	private AGENT_FACTORY_METHODS methodToUse;//phương pháp tạo agent(random, point, area)
+	private String definition;//Định nghĩa agent
 
 	/**
-	 * Create a new agent factory from the given definition.
+	 * Tạo 1 factory agent với các định nghĩa.
 	 * @param agentDefinition
 	 */
 	public AgentFactory(String agentDefinition) throws AgentCreationException {
-
-		// First try to parse the definition - Phân tích định nghĩa: agentDefinition = point:people.shp$repastcity3.agent.DefaultAgent
 		
 		String[] split = agentDefinition.split(":");
 		if (split.length != 2) {
 			throw new AgentCreationException("Problem parsin the definition string '" + agentDefinition
 					+ "': it split into " + split.length + " parts but should split into 2.");
 		}
-		String method = split[0]; // phương thức tạo agent: point
-		String defn = split[1]; // Thông tin về các agent: people.shp$repastcity3.agent.DefaultAgent
+		String method = split[0]; 	// random
+		String defn = split[1]; 	// people.shp$repastcity3.agent.DefaultAgent
 		
-		if (method.equals(AGENT_FACTORY_METHODS.RANDOM.toString())) { //random
+		if (method.equals(AGENT_FACTORY_METHODS.RANDOM.toString())) {
 			this.methodToUse = AGENT_FACTORY_METHODS.RANDOM;
-
-		} else if (method.equals(AGENT_FACTORY_METHODS.POINT_FILE.toString())) {//point
-			this.methodToUse = AGENT_FACTORY_METHODS.POINT_FILE; // = point
-		}
-
-		else if (method.equals(AGENT_FACTORY_METHODS.AREA_FILE.toString())) {//area
+			
+		} else if (method.equals(AGENT_FACTORY_METHODS.POINT_FILE.toString())) {
+			this.methodToUse = AGENT_FACTORY_METHODS.POINT_FILE;
+			
+		} else if (method.equals(AGENT_FACTORY_METHODS.AREA_FILE.toString())) {
 			this.methodToUse = AGENT_FACTORY_METHODS.AREA_FILE;
 		}
 
@@ -75,6 +69,8 @@ public class AgentFactory {
 		this.definition = defn; //= people.shp$repastcity3.agent.DefaultAgent		
 		this.methodToUse.createAgMeth().createagents(true, this);
 	}
+	
+	
 	
 	private enum AGENT_FACTORY_METHODS {
 		RANDOM("random", new CreateAgentMethod() {
@@ -113,26 +109,27 @@ public class AgentFactory {
 		}
 	}
 	
+	
 	interface CreateAgentMethod {
-		void createagents(boolean dummy, AgentFactory af) throws AgentCreationException;//khai báo hàm
+		void createagents(boolean dummy, AgentFactory af) throws AgentCreationException;
 	}
 
 	private void createRandomAgents(boolean dummy) throws AgentCreationException {
 		
-		int numAgents = 20;
+		int numAgents = 30;
 		int agentsCreated = 0;
-		while (agentsCreated < numAgents) {
-			Iterator<Building> i = ContextManager.buildingContext.getRandomObjects(Building.class, numAgents).iterator();
-			while (i.hasNext() && agentsCreated < numAgents) {
-				Building b = i.next(); 					// Find a building
-				IAgent a = new DefaultAgent(); 			// Create a new agent
-				a.setHome(b); 							// Tell the agent where it lives
-				b.addAgent(a); 							// Tell the building that the agent lives there
-				ContextManager.addAgentToContext(a); 	// Add the agent to the context
-														// Finally move the agent to the place where it lives.
-				ContextManager.moveAgent(a, ContextManager.buildingProjection.getGeometry(b).getCentroid());
-				agentsCreated++;
-			}
+		Iterator<Building> randBuildings = ContextManager.buildingContext.getRandomObjects(Building.class, numAgents).iterator();
+		while (randBuildings.hasNext() && agentsCreated < numAgents) {
+			Building randBuilding = randBuildings.next();
+			IAgent agent = new DefaultAgent();
+			
+			agent.setHome(randBuilding);
+			randBuilding.addAgent(agent);
+			
+			ContextManager.addAgentToContext(agent);
+			ContextManager.moveAgent(agent, ContextManager.buildingProjection.getGeometry(randBuilding).getCentroid());
+						
+			agentsCreated++;
 		}
 	}
 

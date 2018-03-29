@@ -97,7 +97,6 @@ public class ContextManager implements ContextBuilder<Object> {
 			
 			mainContext.addSubContext(buildingContext);										// add context con vào contex cha.
 			SpatialIndexManager.createIndex(buildingProjection, Building.class);			//Tạo một chỉ mục không gian mới cho địa lý.
-			System.out.println(buildingContext.getObjects(Building.class).size());
 			//LOGGER.log(Level.FINER, "Read " + buildingContext.getObjects(Building.class).size() + " buildings from "+ buildingFile);
 
 			
@@ -111,7 +110,6 @@ public class ContextManager implements ContextBuilder<Object> {
 			
 			mainContext.addSubContext(roadContext);
 			SpatialIndexManager.createIndex(roadProjection, Road.class);
-			System.out.println(roadContext.getObjects(Road.class).size());
 			//LOGGER.log(Level.FINER, "Read " + roadContext.getObjects(Road.class).size() + " roads from " + roadFile);
 
 			// Create road network
@@ -124,7 +122,7 @@ public class ContextManager implements ContextBuilder<Object> {
 												new GeographyParameters<Junction>(new SimpleAdder<Junction>()));
 			// 2. roadNetwork
 			NetworkBuilder<Junction> builder = new NetworkBuilder<Junction>(GlobalVars.CONTEXT_NAMES.ROAD_NETWORK, junctionContext, false);
-			builder.setEdgeCreator(new NetworkEdgeCreator<Junction>());
+			builder.setEdgeCreator(new NetworkEdgeCreator<Junction>());			//Tạo các cạnh cho mạng được tạo ra
 			roadNetwork = builder.buildNetwork();
 			GISFunctions.buildGISRoadNetwork(roadProjection, junctionContext, junctionGeography, roadNetwork);
 			
@@ -143,11 +141,10 @@ public class ContextManager implements ContextBuilder<Object> {
 					GlobalVars.CONTEXT_NAMES.AGENT_GEOGRAPHY, 
 					agentContext,
 					new GeographyParameters<IAgent>(new SimpleAdder<IAgent>()));
-
-			String agentDefn = ContextManager.getParameter(MODEL_PARAMETERS.AGENT_DEFINITION.toString());
-			     							//agentDefn = point:people.shp$repastcity3.agent.DefaultAgent			
-
+																			//agentDefn = point:people.shp$repastcity3.agent.DefaultAgent
+			String agentDefn = ContextManager.getParameter(MODEL_PARAMETERS.AGENT_DEFINITION.toString());			     							
 			LOGGER.log(Level.INFO, "Creating agents with the agent definition: '" + agentDefn + "'");
+			
 			@SuppressWarnings("unused")
 			AgentFactory agentFactory = new AgentFactory(agentDefn);
 
@@ -266,20 +263,14 @@ public class ContextManager implements ContextBuilder<Object> {
 	}
 
 	/**
-	 * Read the properties file and add properties. Will check if any properties have been included on the command line
-	 * as well as in the properties file, in these cases the entries in the properties file are ignored in preference
-	 * for those specified on the command line.
-	 * 
-	 * @throws FileNotFoundException
-	 * @throws IOException
+	 * Đọc tệp properties (thuộc tính) và thêm thuộc tính.
 	 */
 	private void readProperties() throws FileNotFoundException, IOException {
 		
 		File propFile = new File("./repastcity.properties");
 		if (!propFile.exists()) {
 			throw new FileNotFoundException("Could not find properties file in the default location: "+ propFile.getAbsolutePath());
-		}
-		
+		}		
 		LOGGER.log(Level.FINE, "Initialising properties from file " + propFile.toString());
 		
 		ContextManager.properties = new Properties();		
@@ -301,10 +292,7 @@ public class ContextManager implements ContextBuilder<Object> {
 	}
 
 	/**
-	 * Checks that the given <code>Context</code>s have more than zero objects in them
-	 * 
-	 * @param contexts
-	 * @throws EnvironmentError
+	 * Kiểm tra xem Contexts đã cho có nhiều đối tượng trong đó không
 	 */
 	public void checkSize(Context<?>... contexts) throws EnvironmentError {
 		for (Context<?> c : contexts) {
@@ -323,90 +311,58 @@ public class ContextManager implements ContextBuilder<Object> {
 	}
 
 	/**
-	 * Di chuyển một tác nhân bằng vector. 
-	 * Phương pháp này là cần thiết - chứ không phải là cho các đại lý truy cập trực tiếp tới agentGeography - 
-	 * bởi vì khi nhiều luồng được sử dụng chúng có thể gây nhiễu lẫn nhau và các tác nhân cuối cùng chuyển động không chính xác.
+	 * Di chuyển các đối tượng quy định khoảng cách xác định theo góc cụ thể.
 	 * 
-	 * @param agent
-	 *            The agent to move.
-	 * @param distToTravel
-	 *            Khoảng cách mà họ sẽ travel
-	 * @param angle
-	 *            Góc để travel.
+	 * @param agent The agent to move.
+	 * @param distToTravel Khoảng cách mà họ sẽ travel
+	 * @param angle Góc để travel.
 	 * @see Geography
+	 * @return vị trí hình học mà đối tượng đã được chuyển đến
 	 */
 	public static synchronized void moveAgentByVector(IAgent agent, double distToTravel, double angle) {
 		ContextManager.agentGeography.moveByVector(agent, distToTravel, angle);
 	}
 
 	/**
-	 * Di chuyển một đại lý. Phương pháp này là cần thiết - chứ không phải là cho các đại lý truy cập trực tiếp tới agentGeography 
-	 * - bởi vì khi nhiều luồng được sử dụng chúng có thể gây nhiễu lẫn nhau và các tác nhân cuối cùng chuyển động không chính xác.
+	 * Di chuyển một agent. 
 	 * 
-	 * @param agent
-	 *            The agent to move.
-	 * @param point
-	 *            Điểm đến
+	 * @param agent Agent cần di chuyển
+	 * @param point Điểm đến
 	 */
 	public static synchronized void moveAgent(IAgent agent, Point point) {
 		ContextManager.agentGeography.move(agent, point);
 	}
 
 	/**
-	 * Add an agent to the agent context. This method is required -- rather than giving agents direct access to the
-	 * agentGeography -- because when multiple threads are used they can interfere with each other and agents end up
-	 * moving incorrectly.
-	 * 
-	 * @param agent
-	 *            The agent to add.
+	 *	Add agent vào trong agentContext
 	 */
 	public static synchronized void addAgentToContext(IAgent agent) {
 		ContextManager.agentContext.add(agent);
 	}
 
 	/**
-	 * Get all the agents in the agent context. This method is required -- rather than giving agents direct access to
-	 * the agentGeography -- because when multiple threads are used they can interfere with each other and agents end up
-	 * moving incorrectly.
-	 * 
-	 * @return An iterable over all agents, chosen in a random order. See the <code>getRandomObjects</code> function in
-	 *         <code>DefaultContext</code>
-	 * @see DefaultContext
+	 * Trả về tất cả các agent trong agentContext.
 	 */
 	public static synchronized Iterable<IAgent> getAllAgents() {
 		return ContextManager.agentContext.getRandomObjects(IAgent.class, ContextManager.agentContext.size());
 	}
 
 	/**
-	 * Nhận hình học của tác nhân đã cho. 
-	 * Phương pháp này là cần thiết - chứ không phải là cho các đại lý truy cập trực tiếp tới agentGeography 
-	 * - bởi vì khi nhiều luồng được sử dụng chúng có thể gây nhiễu lẫn nhau và các tác nhân cuối cùng di chuyển không chính xác.
+	 * Lấy vị trí hình học của đối tượng được chỉ định
 	 */
 	public static synchronized Geometry getAgentGeometry(IAgent agent) {
 		return ContextManager.agentGeography.getGeometry(agent);
 	}
 
 	/**
-	 * Get a pointer to the agent context.
-	 * 
-	 * <p>
-	 * Warning: accessing the context directly is not thread safe so this should be used with care. The functions
-	 * <code>getAllAgents()</code> and <code>getAgentGeometry()</code> can be used to query the agent context or
-	 * projection.
-	 * </p>
+	 * Get a pointer to the agent context. Trả về con trỏ trỏ tới agentContext
 	 */
 	public static Context<IAgent> getAgentContext() {
 		return ContextManager.agentContext;
 	}
 
 	/**
-	 * Get a pointer to the agent geography.
-	 * 
-	 * <p>
-	 * Warning: accessing the context directly is not thread safe so this should be used with care. The functions
-	 * <code>getAllAgents()</code> and <code>getAgentGeometry()</code> can be used to query the agent context or
-	 * projection.
-	 * </p>
+	 * Get a pointer to the agent geography. Trả về con trỏ trỏ tới agentGeography
 	 */
 	public static Geography<IAgent> getAgentGeography() {
 		return ContextManager.agentGeography;

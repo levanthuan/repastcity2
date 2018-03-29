@@ -67,52 +67,19 @@ public class Route implements Cacheable {
 	private int currentPosition; //vị trí hiện tại
 	private List<Coordinate> routeX;
 	private List<Double> routeSpeedsX;
-	/*
-	 * This maps route coordinates to their containing Road, used so that when travelling we know which road/community the agent is on. private
-	 */
+
 	private List<Road> roadsX;
-	/*
-	 * Cache every coordinate which forms a road so that Route.onRoad() is quicker. 
-	 * Also save the Road(s) they are part of, useful for the agent's awareness space (see getRoadFromCoordCache()).
-	 */
+
 	private static volatile Map<Coordinate, List<Road>> coordCache;
-	/*
-	 * Cache the nearest road Coordinate to every building for efficiency 
-	 * (agents usually/always need to get from the centroids of houses to/from the nearest road).
-	 */
+
 	private static volatile NearestRoadCoordCache nearestRoadCoordCache;
 	
-	/**
-	 * Creates a new Route object - Tạo 1 đối tượng lộ trình mới
-	 * 
-	 * @param burglar
-	 *            The burglar which this Route will control.
-	 * @param destination
-	 *            The agent's destination.
-	 * @param destinationBuilding
-	 *            The (optional) building they're heading to.
-	 */
 	public Route(IAgent agent, Coordinate destination, Building destinationBuilding) {
 		this.destination = destination;
 		this.agent = agent;
 		this.destinationBuilding = destinationBuilding;
 	}
 
-	/**
-	 * Tìm một tuyến đường từ gốc đến đích. 
-	 * Một tuyến đường là danh sách các Tọa độ mô tả tuyến đường đến một điểm đến hạn chế cho một mạng lưới đường bộ. 
-	 * Thuật toán bao gồm ba phần chính:
-	 * 
-	 * Tìm hiểu xem đại lý đang ở trên đường đã có, nếu không thì di chuyển đến đoạn đường gần nhất
-	 * Đi từ vị trí hiện tại (có thể giữa điểm trên đường) tới điểm giao gần nhất
-	 * Đi đến ngã ba gần nhất với điểm đến của chúng ta (sử dụng con đường ngắn nhất của Dijkstra)
-	 * Đi từ ngã ba cuối cùng đến con đường gần nhất đến đích
-	 * <li>
-	 * Di chuyển từ đường đi đến đích
-	 * </ol>
-	 * 
-	 * @throws Exception
-	 */
 	protected void setRoute() throws Exception {
 		this.routeX = new Vector<Coordinate>();
 		this.roadsX = new Vector<Road>();
@@ -120,6 +87,10 @@ public class Route implements Cacheable {
 
 		Coordinate currentCoord = ContextManager.getAgentGeometry(this.agent).getCoordinate();	//tọa độ hiện tại
 		Coordinate destCoord = this.destination;												// tọa độ nơi đến		
+
+		double x = currentCoord.x;
+		double y = currentCoord.y;
+		System.out.println("curent-X = "+x+" curent-Y = "+y+" dest-X: "+ destCoord.x +"dest-Y: "+ destCoord.y);
 		
 		try {
 			boolean destinationOnRoad = true; 		//true: tọa độ điểm cuối có nằm trên roads, false: tọa độ ko nằm trên roads
