@@ -71,7 +71,7 @@ public class ContextManager implements ContextBuilder<Object> {
 		mainContext.setId(GlobalVars.CONTEXT_NAMES.MAIN_CONTEXT);
 		
 		try {
-			readProperties(); 													// đọc file model tính chất
+			readProperties();
 		} catch (IOException ex) {
 			throw new RuntimeException("Could not read model properties,  reason: " + ex.toString(), ex);
 		}
